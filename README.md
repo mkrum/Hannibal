@@ -29,3 +29,6 @@
 [Nash Q-Learning for General Sum Stochastic Games](https://www.jmlr.org/papers/volume4/hu03a/hu03a.pdf)
 
 [(BRPI) Learning to Play No-Press Diplomacy with Best Response Policy Iteration](https://arxiv.org/abs/2006.04635)
+
+# Environments
+[Can Deep Reinforcement Learning Solve Erdos-Selfridge-Spencer Games?](https://arxiv.org/abs/1711.02301)
