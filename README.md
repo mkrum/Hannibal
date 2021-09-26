@@ -27,3 +27,5 @@
 [Deep Counterfactual Regret Minimization](https://arxiv.org/abs/1811.00164)
 
 [Nash Q-Learning for General Sum Stochastic Games](https://www.jmlr.org/papers/volume4/hu03a/hu03a.pdf)
+
+[(BRPI) Learning to Play No-Press Diplomacy with Best Response Policy Iteration](https://arxiv.org/abs/2006.04635)
