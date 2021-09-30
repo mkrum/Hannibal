@@ -1,3 +1,6 @@
+# Overview
+
+
 # Papers
 
 ## Survey
@@ -7,6 +10,8 @@
 [α-Rank: Multi-Agent Evaluation by Evolution](https://www.nature.com/articles/s41598-019-45619-9)
 
 [αα-Rank: Practically Scaling α-Rank through Stochastic Optimisation](https://arxiv.org/abs/1909.11628)
+
+[Esitmating α-rank by Maximizing Information Gain](https://arxiv.org/abs/2101.09178)
 
 ## Algorithms
 [Fictitious Self-Play in Extensive-Form Games](http://proceedings.mlr.press/v37/heinrich15.pdf)
