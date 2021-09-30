@@ -13,6 +13,8 @@
 
 [Esitmating α-rank by Maximizing Information Gain](https://arxiv.org/abs/2101.09178)
 
+[(Nash Averaging) Re-evaluating Evaluation](https://arxiv.org/pdf/1806.02643.pdf)
+
 ## Algorithms
 [Fictitious Self-Play in Extensive-Form Games](http://proceedings.mlr.press/v37/heinrich15.pdf)
 
