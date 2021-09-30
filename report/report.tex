@@ -1,0 +1,82 @@
+\documentclass{article}
+
+\usepackage[margin=0.5in]{geometry}
+\usepackage{natbib}
+
+\begin{document}
+
+\noindent \large\textbf{A Mulit-Armed Analysis of Policy Space Repeating Oracle
+(PSRO)}
+
+\noindent \large Michael Krumdick, Geoffrey Liu
+
+\section{Introduction}
+Most Multi-agent reinforcement learning (MARL) can be split up into two
+distinct steps \cite{PSRO}. First, given our current population of agents,
+define the distribution of agents that minimizes exploitability using a
+meta-solver, such as regret minimization. Second, given this distribution, find
+a new agent that best exploits it, and add it to the population. This simple
+framework encompasses a wide range of different algorithms, including
+independent reinforcement learning, self-play, fictitious self-play, and
+iterated best response. 
+
+We want to see if we can use what we have learned in class to model the policy
+selection step as a multi-armed bandit problem. We hope that this will give us
+insight in the following two areas.
+
+\begin{enumerate}
+	\item \textbf{Space Complexity:} The meta-solvers are typically complex and
+        require computing an $N$ by $N$ payoff matrix for a population of size
+        $N$. Using concepts from streaming bandits, 
+	\item \textbf{Bounds:} Not much is known about the bounds on sample
+        complexity for these types of algorithms. There exist convergence
+        guarantees, but nothing guarenteeing how many updates you need to get
+        good performance. If we can frame the policy selection step as a
+        multi-armed bandit 
+\end{enumerate}
+
+Unrelated to multi-armed bandit problems, we are also interested in;
+\begin{enumerate}
+	\item \textbf{Populations of Regret Based Agents:} Independent RL works as an approximate best
+        response, but there exist deep regret based models. To the best of our
+        knowledge, no one has tried combining regret based models with a
+        PSRO-like approach.
+\end{enumerate}
+
+\section{Motivation}
+The multi-agent setting for RL agents is the most realistic for many real world
+tasks. The environment is often always non-static, meaning the other agents in
+the world will be adapting to the agents behavior. There has been a recent push
+to focus research on these areas
+
+\section{Plan}
+Our plan includes an ambitious goal with a few different "off-ramps" if we get
+stuck. The idea is to move in a progression, starting with analysis and
+increasing complexity until hopefully we have something novel. We will start be
+identifying and environment or series of environments. Ideally, we want a single
+environment that can scale in complexity. This will allow us to 
+
+Our hope is to be able to follow the general framework explored in \cite{dip}.
+\begin{enumerate}
+	\item \textbf{Exploration:} Implement and analyze baselines in simple
+        normal-form games. This gives a quick 
+	\item \textbf{Design:} Using ideas from the material in this class and our
+		understanding of reinforcement learning, try to make a modification or
+		adaptation of one of these algorithms that leads to improving some
+		quality of performance. This may include sample complexity, space complexity or
+		simplicity.
+    \item \textbf{Application:} Modify this algorithm to work with deep reinforcement learning agents
+      and demonstrate its application on a more complex environment.
+\end{enumerate}
+
+One that is particularly interesting is Erdos-Selfrdige-Spencer \cite{ESS} games.
+
+\section{Related Works}
+We already have the PSRO \cite{PSRO} framework for representing these types of
+algorithms. 
+
+\bibliography{report}
+
+\bibliographystyle{plain}
+
+\end{document}
