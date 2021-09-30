@@ -11,7 +11,7 @@
 \noindent \large Michael Krumdick, Geoffrey Liu
 
 \section{Introduction}
-Most Multi-agent reinforcement learning (MARL) can be split up into two
+Most multi-agent reinforcement learning (MARL) algorithms can be split up into two
 distinct steps \cite{PSRO}. First, given our current population of agents,
 define the distribution of agents that minimizes exploitability using a
 meta-solver, such as regret minimization. Second, given this distribution, find
@@ -20,19 +20,22 @@ framework encompasses a wide range of different algorithms, including
 independent reinforcement learning, self-play, fictitious self-play, and
 iterated best response. 
 
-We want to see if we can use what we have learned in class to model the policy
-selection step as a multi-armed bandit problem. We hope that this will give us
-insight in the following two areas.
+We want to see if we can use what we have learned in class to model the
+meta-solving step as a multi-armed bandit problem. We hope that this will give
+us insight in the following potential areas.
 
 \begin{enumerate}
 	\item \textbf{Space Complexity:} The meta-solvers are typically complex and
         require computing an $N$ by $N$ payoff matrix for a population of size
-        $N$. Using concepts from streaming bandits, 
+        $N$. Using concepts from streaming bandits, we would like to see if we
+        could maintain a fixed population of $k$ agents, discarding those that
+        are no longer need.
 	\item \textbf{Bounds:} Not much is known about the bounds on sample
         complexity for these types of algorithms. There exist convergence
-        guarantees, but nothing guarenteeing how many updates you need to get
-        good performance. If we can frame the policy selection step as a
-        multi-armed bandit 
+        guarantees, but nothing providing insights how many update steps you
+        need to get good performance. If we can frame the policy selection step
+        as a multi-armed bandit problem, we can maybe re-use some of the bounds
+        we've learned about in class.
 \end{enumerate}
 
 Unrelated to multi-armed bandit problems, we are also interested in;
@@ -41,6 +44,11 @@ Unrelated to multi-armed bandit problems, we are also interested in;
         response, but there exist deep regret based models. To the best of our
         knowledge, no one has tried combining regret based models with a
         PSRO-like approach.
+    \item \textbf{Approximate PSRO:} Most meta-solvers require finding some kind
+        exact solution with a complex algorithm that scales poorly as the number
+        of agents, $N$, increases. There have been some works in finding
+        approximate solutions using stochastic optimization \cite{alphalpha},
+        but we see this as an area with a lot of potential.
 \end{enumerate}
 
 \section{Motivation}
