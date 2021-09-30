@@ -29,6 +29,8 @@
 ## DRL-Adapted Algorithms
 [(PSRO) A Unified Game-Theoretic Approach to Multiagent Reinforcement Learning](https://arxiv.org/pdf/1711.00832.pdf)
 
+[(PSRO + α-Rank) A Generalized Training Approach for Multiagent Learning](https://arxiv.org/abs/1909.12823)
+
 [(NFSP) Deep Reinforcement Learning from Self-Play in Imperfect-Information Games](https://arxiv.org/abs/1603.01121)
 
 [Deep Counterfactual Regret Minimization](https://arxiv.org/abs/1811.00164)
@@ -36,6 +38,7 @@
 [Nash Q-Learning for General Sum Stochastic Games](https://www.jmlr.org/papers/volume4/hu03a/hu03a.pdf)
 
 [(BRPI) Learning to Play No-Press Diplomacy with Best Response Policy Iteration](https://arxiv.org/abs/2006.04635)
+
 
 # Environments
 [Can Deep Reinforcement Learning Solve Erdos-Selfridge-Spencer Games?](https://arxiv.org/abs/1711.02301)
