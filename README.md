@@ -7,13 +7,15 @@
 [Algorithms in Multi-Agent Systems: A Holistic Perspective from Reinforcement Learning and Game Theory](https://arxiv.org/abs/2001.06487v3)
 
 ## Solution Concepts
-[α-Rank: Multi-Agent Evaluation by Evolution](https://www.nature.com/articles/s41598-019-45619-9)
+[α-Rank: Multi-Agent Evaluation by Evolution](https://arxiv.org/abs/1903.01373)
 
 [αα-Rank: Practically Scaling α-Rank through Stochastic Optimisation](https://arxiv.org/abs/1909.11628)
 
 [Esitmating α-rank by Maximizing Information Gain](https://arxiv.org/abs/2101.09178)
 
-[(Nash Averaging) Re-evaluating Evaluation](https://arxiv.org/pdf/1806.02643.pdf)
+[Multiagent Evaluation under Incomplete Information](https://arxiv.org/abs/1909.09849)
+
+[(Nash Averaging) Re-evaluating Evaluation](https://arxiv.org/abs/1806.02643)
 
 ## Algorithms
 [Fictitious Self-Play in Extensive-Form Games](http://proceedings.mlr.press/v37/heinrich15.pdf)
