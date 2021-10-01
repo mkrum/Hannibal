@@ -3,6 +3,12 @@
 
 # Papers
 
+## Repo
+
+[Estimating alpha-Rank from A Few Entries with Low Rank Matrix Completion](https://github.com/yalidu/optEval)
+
+[Estimating alpha-Rank by Maximising Information Gain](https://github.com/microsoft/InfoGainalpharank)
+
 ## Survey
 [Algorithms in Multi-Agent Systems: A Holistic Perspective from Reinforcement Learning and Game Theory](https://arxiv.org/abs/2001.06487v3)
 
