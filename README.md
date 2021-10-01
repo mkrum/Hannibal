@@ -6,6 +6,8 @@
 ## Survey
 [Algorithms in Multi-Agent Systems: A Holistic Perspective from Reinforcement Learning and Game Theory](https://arxiv.org/abs/2001.06487v3)
 
+[Multi-Agent Reinforcement Learning: A Selective Overview of Theories and Algorithms](https://arxiv.org/pdf/1911.10635.pdf)
+
 ## Solution Concepts
 [α-Rank: Multi-Agent Evaluation by Evolution](https://arxiv.org/abs/1903.01373)
 
@@ -40,6 +42,8 @@
 [Nash Q-Learning for General Sum Stochastic Games](https://www.jmlr.org/papers/volume4/hu03a/hu03a.pdf)
 
 [(BRPI) Learning to Play No-Press Diplomacy with Best Response Policy Iteration](https://arxiv.org/abs/2006.04635)
+
+[Iterative empircal game solving via single policy best response](https://openreview.net/pdf?id=R4aWTjmrEKM)
 
 
 # Environments
