@@ -5,33 +5,60 @@
 
 \begin{document}
 
-\noindent \large\textbf{Approximating Policy Space Repeating Oracle For Large Populations of Agents}
+\noindent \large\textbf{Multiagent Reinforcement Learning and Multiarmed Bandits}
 
 \noindent \large Michael Krumdick, Geoffrey Liu
 
 \section{Introduction}
-Most multi-agent reinforcement learning (MARL) algorithms can be split up into two
-distinct steps. First, given our current population of agents,
-define the distribution of agents that minimizes exploitability using a
-meta-solver, such as regret minimization. Second, given this distribution, find
-a new agent that best exploits it, and add it to the population. This simple
-framework, called Policy Space Repeating Oracle (PSRO) \cite{PSRO}, encompasses
-a wide range of different algorithms, including independent reinforcement
-learning, self-play, fictitious self-play, and iterated best response. 
 
-One of the core limitations of PSRO is the meta-solving step. Most meta-solvers
-are brittle and slow as the number of agents, $N$, increases. This effectively
-limits the maximum population size. What we want to develop is a scalable,
-stochastic approximation of one of the meta-solvers by framing the collection of
-payoffs between the agents as a multi-armed bandit problem. Imagine you have a
-large number of agents and an expensive evaluation function that computes the
-payoff for playing one agent against another. Effectively, what we want to find
-is an efficient algorithm for deciding which of those squares in our matrix to
-fill in. As $M$, our total evaluation budget, goes to $N^2$, we will have our
-exact solver from before. Intuitively, if we have a large number of agents,
-there exists a subset of those agents we can use to find a good approximate
-meta-solution. The hope is that by increasing the total agents to consider,
-finding a good subset should become easier.
+Multi-agent reinforcement learning (MARL) problems are about finding a set of
+agents that define an optimal set of policies for some environment. Optimality is usually
+interpreted in terms of exploitability, meaning if we swapped out one of our
+agents with a new agent, they could not achieve a higher level of performance than
+the agent before them. Most people associate these sorts of equilibrium with the
+nash equilibrium\cite{nash}, but the MARL framework is typically more general.
+
+Most multi-agent reinforcement learning algorithms involve reasoning over
+empirical games. These games are abstractions over a possibly complex
+environment that allow us to reason about things like the nash equilibrium by
+framing it as a normal-form game. The most common formulation of these
+meta-games is to define the actions to be the set of currently existing
+agents, $\{\pi_1, \pi_2, \dots \pi_n\}$ and the payoff to be the expected payoff
+of playing the agents against each other. If we can find a equilibrium solution
+to this game using some kind of meta-solver, we can then find a new agent that
+is a best response to this equilibrium by training it against this distribution
+using standard reinforcement learning techniques. We can then add this agent to
+our population of agents and repeat. This general framework is known as Policy
+Space Repeating Oracle (PSRO) \cite{PSRO}. Eventually, this iterative process
+will coverage to the solution for our actual game.
+
+One commonly used and powerful meta-solver is $\alpha$-rank. \cite{alpha} \cite{alphaPSRO}
+This computes a ranking over the agents by analyzing the payoff matrix, $M$.
+For the two player symmetric case, this matrix stores the expected payoff, or
+$\nu$ of using agent $i$, $\pi_i$, versus agent $j$, $\pi_j$, such
+that $M_{i, j} = \nu(\pi_i, \pi_j)$. Importantly, in the most common setting for
+$\alpha$-rank, the only thing that matters is whether of not $\nu(\pi_i, \pi_j)
+> \nu(\pi_j, \pi_i)$. Meaning, that we can replace our dense payoff matrix, $M$,
+with an equivalent binary one 
+
+Most analyses for $\alpha$-rank, including its introduction, assume you have a
+perfect estimate of $M$. However, this is not realistic in most cases. When we
+are interested in stochastic agents and environments, our $M$ becomes a random
+variable, $\hat{M}$, that we need to estimate via simulation. Often times, these
+simulations are expensive to run. Not only that, but our payoff matrix grows
+exponentially as we add new players and strategies.
+
+This then becomes an interesting mulit-armed bandit problem: how do we allocate
+those samples to each agent configuration to have the lowest probability of
+making an error with our meta-solver? \cite{goodone} introduced this formulation
+and provide some algorithms and bounds for doing so, including the sample
+complexity required to have a $1 - \delta$ error guarantee for our
+meta-solution. Both this approach \cite{IM} and $\alpha$-rank itself
+\cite{alphaalpha}, have had improvements suggested in performance. We would like to
+see if we can use this problem framing to not just improve the performance of
+each part separately, but the process as a whole. At the very least, we would
+like to perform an empirical analysis of the different convergence properties of
+these types of algorithms.
 
 \section{Motivation}
 For a few decades, the large majority of research being done in reinforcement
@@ -61,7 +88,7 @@ Our plan is to follow in a framework similar to \cite{dip}. We will first:
         attempt to design a scalable algorithm for computing the approximate
         equilibria.
     \item \textbf{Application:} Modify this algorithm to work with deep reinforcement learning agents
-      and demonstrate its application on a more complex environment.
+        and demonstrate its application on a more complex environment.
 \end{enumerate}
 Since this is a research project, we want to make sure that we have a good
 number of off-ramps when things do not go as planned. Once we have implemented
@@ -87,15 +114,14 @@ would complicated to simulate as a simple normal-form game and they are lacking
 open source implementations.
 
 \section{Related Works}
-There are a few works we would like to build off of. The AlphaRank paper
-proposed a polynomial time solution to the equilibrium points for multi-agent
-systems. \cite{alpha} However, this algorithm has been shown to be time
-consuming to compute in practice due to the exponentially large payoff matrix.
-Other works have tried to improve it's performance, such as \cite{alphalpha},
-but the majority of these try to speed up the calculation of the equilibrium
-given the large matrix. What we want to do is instead try to use our collection
-strategy to convert the possibly large matrix into a smaller matrix with a
-solution of approximately equal quality.
+We have cited a few related works throughout this document, but the most
+important ones are: the original $\alpha$-rank paper \cite{alpha}, the paper about
+connecting $\alpha$-rank with PSRO \cite{alphaPSRO}, and the paper about
+interpreting the payoff matrix estimation as a multi-armed bandit problem
+\cite{goodone}. By simply optimizing the payoff table collection, they were
+able to establish a PAC bound on sample complexity. However, this bound relies
+on unrealistic information, i.e. knowing the some information about the gaps
+between the agents beforehand.
 
 \bibliography{report}
 
