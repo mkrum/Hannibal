@@ -42,7 +42,7 @@ def main():
     agents = [random_policy.__copy__() for _ in range(n_players)]
 
     for N in [1, 10, 100, 1000]:
-        log_file = open("data_{N}.dat", "w")
+        log_file = open(f"data_{N}.dat", "w")
 
         for _ in range(5):
             PSRO = PSROSolver(
