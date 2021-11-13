@@ -11,7 +11,6 @@ def get_counts(N, history):
     return counts
 
 def compute_matrix(N, history):
-    
     counts = get_counts(N, history)
 
     meta = np.zeros((N, N))
@@ -143,7 +142,7 @@ def compute_meta_game(psro, sampler, N, history):
     Returns:
       Meta game payoff matrix.
     """
-    budget = sum(N * (2 * (i + 1) + 1) for i in range(len(psro._policies[0])))
+    budget = sum(N * (2 * (i + 1) + 1) for i in range(-1, len(psro._policies[0])))
     meta_game = sampler(psro, budget - len(history), history)
     assert len(history) <= budget
 
