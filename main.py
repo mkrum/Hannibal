@@ -2,6 +2,9 @@
 import time
 import tqdm
 import pickle as pkl
+import string
+import random
+import argparse
 
 import pyspiel
 import numpy as np
@@ -15,7 +18,7 @@ from open_spiel.python.algorithms.psro_v2 import ( best_response_oracle,
 from open_spiel.python.algorithms.psro_v2.psro_v2 import PSROSolver
 from open_spiel.python.algorithms.psro_v2.optimization_oracle import AbstractOracle
 
-from samplers import compute_meta_game, baseline_uniform, initialize_history, ucb
+from samplers import *
 
 
 def meta_game_to_list(meta_game):
@@ -24,7 +27,7 @@ def meta_game_to_list(meta_game):
     return meta_game
 
 
-def debug_iteration(psro, sampler, N, history):
+def debug_iteration(psro, sampler, N, history, verbose=False):
     psro._iterations += 1
 
     info = {
@@ -55,10 +58,11 @@ def debug_iteration(psro, sampler, N, history):
     info["total_elapse"] = (
         info["oracle_elapse"] + info["sims_elapse"] + info["meta_solve_elapse"]
     )
-
-    info["meta_game"] = pkl.dumps(psro.get_meta_game())
-    info["meta_strategies"] = pkl.dumps(psro.get_meta_strategies())
-    info["policies"] = pkl.dumps(psro.get_policies())
+    
+    if verbose:
+        info["meta_game"] = pkl.dumps(psro.get_meta_game())
+        info["meta_strategies"] = pkl.dumps(psro.get_meta_strategies())
+        info["policies"] = pkl.dumps(psro.get_policies())
     return info
 
 
@@ -75,11 +79,9 @@ def get_exploitability(env, n_players, PSRO):
     policies = get_aggregate_policy(env.game, PSRO)
     return exploitability.nash_conv(env.game, policies)
 
-
-def main():
+def generate_data(prd, N, data_dir, sampler, steps=100):
     n_players = 2
 
-    # Turn game into argument
     game = pyspiel.load_game_as_turn_based("kuhn_poker", {"players": n_players})
 
     env = rl_environment.Environment(game)
@@ -91,62 +93,71 @@ def main():
     )
 
     agents = [random_policy.__copy__() for _ in range(n_players)]
-
-    runs = 1
-    steps = 100
-    meta_strategy = "prd"
-
-    prd = 10000
-   
-    i = 0
-    while True:
         
-        for N in [1, 10, 100, 1000]:
-            print((i, N))
-            log_file = open(f"data/baseline_{N}_{i}.dat", "w")
-    
-            for _ in range(runs):
-                PSRO = PSROSolver(
-                    env.game,
-                    oracle,
-                    meta_strategy_method="prd",
-                    initial_policies=agents,
-                    training_strategy_selector=strategy_selectors.probabilistic,
-                    sims_per_entry=N,
-                    sample_from_marginals=True,
-                    # Oracle kwargs
-                    symmetric_game=False,
-                    prd_iterations=prd,
-                    prd_gamma=1e-10,
-                )
-    
-                exploit = get_exploitability(env, n_players, PSRO)
-    
-                info = {
-                    "type": "init",
-                    "meta_strategy": "nash",
-                    "meta_game": pkl.dumps(PSRO.get_meta_game()),
-                    "meta_strategies": pkl.dumps(PSRO.get_meta_strategies()),
-                    "policies": pkl.dumps(PSRO.get_policies()),
-                    "starting_exploit": exploit,
-                }
-                log_file.write(str(info) + "\n")
-                history = initialize_history(PSRO, N)
-    
-                for it in tqdm.tqdm(range(steps)):
-                    info = debug_iteration(PSRO, baseline_uniform, N, history)
-                    info["it"] = it
-    
-                    exploit = get_exploitability(env, n_players, PSRO)
-                    info["exploit"] = exploit
-    
-                    log_file.write(str(info) + "\n")
-                    log_file.flush()
-    
-            log_file.close()
+    random_extension = ''.join(random.choice(string.ascii_lowercase) for i in range(8))
+    print(random_extension)
+    log_file = open(f"{data_dir}/{sampler.__name__}_{N}_{prd}_{random_extension}.dat", "w")
 
-        i += 1
+    PSRO = PSROSolver(
+        env.game,
+        oracle,
+        meta_strategy_method="prd",
+        initial_policies=agents,
+        training_strategy_selector=strategy_selectors.probabilistic,
+        sims_per_entry=N,
+        sample_from_marginals=True,
+        # Oracle kwargs
+        symmetric_game=False,
+        prd_iterations=prd,
+        prd_gamma=1e-10,
+    )
 
+    exploit = get_exploitability(env, n_players, PSRO)
+
+    info = {
+        "type": "init",
+        "meta_strategy": "prd",
+        "meta_game": pkl.dumps(PSRO.get_meta_game()),
+        "meta_strategies": pkl.dumps(PSRO.get_meta_strategies()),
+        "policies": pkl.dumps(PSRO.get_policies()),
+        "starting_exploit": exploit,
+    }
+    log_file.write(str(info) + "\n")
+    history = initialize_history(PSRO, N)
+
+    for it in tqdm.tqdm(range(steps)):
+        info = debug_iteration(PSRO, sampler, N, history)
+        info["it"] = it
+
+        exploit = get_exploitability(env, n_players, PSRO)
+        info["exploit"] = exploit
+
+        log_file.write(str(info) + "\n")
+        log_file.flush()
+
+    log_file.close()
+
+
+def main(prd, N, data_dir, sampler):
+
+    while True:
+        generate_data(prd, N, data_dir, sampler)
 
 if __name__ == "__main__":
-    main()
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--prd", default=10000, type=int, help="Number of PRD steps")
+    parser.add_argument("--N", default=10, type=int, help="Samples Per Interaction")
+    parser.add_argument("--sampler", default="baseline_uniform", help="Name of sampler")
+    parser.add_argument("--dir", default="data", help="output_directory")
+    args = parser.parse_args()
+
+    sampler = None
+    if args.sampler == "baseline_uniform":
+        sampler = baseline_uniform
+    elif args.sampler == "ucb":
+        sampler = ucb
+    elif args.sampler == "simple_ucb":
+        sampler = simple_ucb
+
+    main(args.prd, args.N, args.data, sampler)

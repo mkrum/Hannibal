@@ -89,6 +89,51 @@ def ucb(psro, budget, history):
     return meta_game
 
 
+def compute_bounds(mean, counts, delta):
+    range_ = 4
+    interval = np.sqrt((np.log(2 / delta) * (range_ ** 2)) / (2 * counts))
+    return (mean - interval, mean + interval)
+
+def simple_ucb(psro, budget, history):
+
+    policies = [psro._policies[k] + psro._new_policies[k] for k in range(psro._num_players)]
+
+    size = len(policies[0]) - 1
+    for i in range(size):
+        sample(psro, history, i, size)
+        sample(psro, history, size, i)
+        budget -= 2
+
+    sample(psro, history, size, size)
+    budget -= 1
+
+    means = compute_matrix(len(policies[0]), history)
+    counts = get_counts(len(policies[0]), history)
+
+    d = 0.01
+
+    lower, upper = compute_bounds(means, counts, d)
+    unresolved = (lower < 0.0) | (upper > 0.0)
+    unresolved = np.nonzero(unresolved)
+
+    while budget > 0:
+        sampled = np.random.choice(len(unresolved[0]))
+        i = unresolved[0][sampled]
+        j = unresolved[1][sampled]
+        out = sample(psro, history, i, j)
+
+        counts[i, j] += 1
+        means[i, j] = ((counts[i, j] - 1) * means[i, j] + out) / counts[i, j]
+
+        lower, upper = compute_bounds(means, counts, d)
+        unresolved = (lower < 0.0) | (upper > 0.0)
+        unresolved = np.nonzero(unresolved)
+
+        budget -= 1
+
+    meta_game = compute_matrix(len(policies[0]), history)
+    return meta_game
+
 def compute_meta_game(psro, sampler, N, history):
     """Given new agents in _new_policies, update meta_game through simulations.
 
