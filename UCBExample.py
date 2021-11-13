@@ -38,31 +38,34 @@ class FreqBandit:
 
     def __init__(
         self,
-        num_strats,
+        means,
+        counts,
         max_payoff=1,
-        min_payoff=0,
-        delta=0.1,
+        min_payoff=-1,
+        delta=0.01,
     ):
         
-        self.num_strats = num_strats
         self.num_players = 2
+
+        self.means = means
+        self.counts = counts
+
+        self.num_strats = means.shape[0]
 
         self.delta = delta
         self.range = max_payoff - min_payoff
 
         shape = tuple(self.num_strats for _ in range(self.num_players))
-        self.means = np.zeros(shape=shape)
-        self.counts = np.zeros(shape=shape)
 
         self.logger = logging.getLogger("Freq_Bandit")
         np.random.seed()
 
         self.unresolved_pairs = set()
 
-        for base_strat in product(range(num_strats), repeat=self.num_players):
+        for base_strat in product(range(self.num_strats), repeat=self.num_players):
             for n in range(self.num_players):
                 # For each player that can deviate
-                for strat_index in range(num_strats):
+                for strat_index in range(self.num_strats):
                     # For each strategy they can change to
                     if strat_index == base_strat[n]:
                         continue  # Not a different strategy, move on
@@ -72,6 +75,8 @@ class FreqBandit:
 
                     unresolved_pair = (base_strat, new_strat)
                     self.unresolved_pairs.add(unresolved_pair)
+
+        self._update_unresolved()
 
     def is_resolved(self):
         return len(self.unresolved_pairs) == 0
@@ -95,6 +100,9 @@ class FreqBandit:
             (N - 1) * self.means[strats] + payoff
         ) / N
 
+        self._update_unresolved()
+    
+    def _update_unresolved(self):
         # Update the unresolved strategy pairs
         # Brute force for now
         pairs_to_remove = set()
