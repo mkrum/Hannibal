@@ -110,13 +110,13 @@ def simple_ucb(psro, budget, history):
     means = compute_matrix(len(policies[0]), history)
     counts = get_counts(len(policies[0]), history)
 
-    d = 0.01
+    d = 1.5
 
     lower, upper = compute_bounds(means, counts, d)
-    unresolved = (lower < 0.0) | (upper > 0.0)
+    unresolved = (lower < 0.0) & (upper > 0.0)
     unresolved = np.nonzero(unresolved)
 
-    while budget > 0:
+    while budget > 0 and len(unresolved[0]) > 0:
         sampled = np.random.choice(len(unresolved[0]))
         i = unresolved[0][sampled]
         j = unresolved[1][sampled]
@@ -126,11 +126,11 @@ def simple_ucb(psro, budget, history):
         means[i, j] = ((counts[i, j] - 1) * means[i, j] + out) / counts[i, j]
 
         lower, upper = compute_bounds(means, counts, d)
-        unresolved = (lower < 0.0) | (upper > 0.0)
+        unresolved = (lower < 0.0) & (upper > 0.0)
         unresolved = np.nonzero(unresolved)
 
         budget -= 1
-
+    
     meta_game = compute_matrix(len(policies[0]), history)
     return meta_game
 
@@ -143,10 +143,9 @@ def compute_meta_game(psro, sampler, N, history):
     Returns:
       Meta game payoff matrix.
     """
-    budget = N * (2 * len(psro._policies[0]) + 1)
-    og_len = len(history)
-    meta_game = sampler(psro, budget, history)
-    assert (len(history) - og_len) <= budget
+    budget = sum(N * (2 * (i + 1) + 1) for i in range(len(psro._policies[0])))
+    meta_game = sampler(psro, budget - len(history), history)
+    assert len(history) <= budget
 
     meta_game = [meta_game, -meta_game]
 
