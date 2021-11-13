@@ -1,5 +1,6 @@
 
 import time
+import os
 import tqdm
 import pickle as pkl
 import string
@@ -159,5 +160,6 @@ if __name__ == "__main__":
         sampler = ucb
     elif args.sampler == "simple_ucb":
         sampler = simple_ucb
-
-    main(args.prd, args.N, args.data, sampler)
+    
+    os.makedirs(args.dir, exist_ok=True)
+    main(args.prd, args.N, args.dir, sampler)
