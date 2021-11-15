@@ -19,6 +19,22 @@ def compute_matrix(N, history):
 
     return meta / counts
 
+def compute_variance(N, history):                                  
+                                                                   
+    possible = list(itertools.product(range(N), range(N)))         
+                                                                   
+    var = {p: [] for p in possible}                
+                                                                   
+    for ((i, j), v) in history:                                 
+        var[i, j].append(v)                                        
+                                                                   
+    var_mat = np.zeros((N, N))
+                                                                   
+    for p in possible:                          
+        var_mat[p] = np.var(var[p])
+
+    return var_mat
+
 def sample(psro, history, i, j):
     policies = [psro._policies[k] + psro._new_policies[k] for k in range(psro._num_players)]
     samp = [policies[0][i], policies[1][j]]
@@ -47,6 +63,10 @@ def baseline_uniform(psro, budget, history):
     
     meta_game = compute_matrix(len(policies[0]), history)
     return meta_game
+
+def baseline_uniform_binary(psro, budget, history):
+    out = baseline_uniform(psro, budget, history)
+    return np.sign(out)
 
 def ucb(psro, budget, history):
 
@@ -96,20 +116,21 @@ def compute_bounds(mean, counts, delta):
 def simple_ucb(psro, budget, history):
 
     policies = [psro._policies[k] + psro._new_policies[k] for k in range(psro._num_players)]
+    
+    for _ in range(5):
+        size = len(policies[0]) - 1
+        for i in range(size):
+            sample(psro, history, i, size)
+            sample(psro, history, size, i)
+            budget -= 2
 
-    size = len(policies[0]) - 1
-    for i in range(size):
-        sample(psro, history, i, size)
-        sample(psro, history, size, i)
-        budget -= 2
-
-    sample(psro, history, size, size)
-    budget -= 1
+        sample(psro, history, size, size)
+        budget -= 1
 
     means = compute_matrix(len(policies[0]), history)
     counts = get_counts(len(policies[0]), history)
 
-    d = 1.5
+    d = 0.01
 
     lower, upper = compute_bounds(means, counts, d)
     unresolved = (lower < 0.0) & (upper > 0.0)
@@ -130,6 +151,45 @@ def simple_ucb(psro, budget, history):
 
         budget -= 1
     
+    meta_game = compute_matrix(len(policies[0]), history)
+    return meta_game
+
+def gap(psro, budget, history):
+
+    policies = [psro._policies[k] + psro._new_policies[k] for k in range(psro._num_players)]
+    
+    for _ in range(5):
+        size = len(policies[0]) - 1
+        for i in range(size):
+            sample(psro, history, i, size)
+            sample(psro, history, size, i)
+            budget -= 2
+
+        sample(psro, history, size, size)
+        budget -= 1
+    
+    counts = get_counts(len(policies[0]), history)
+    var = compute_variance(len(policies[0]), history)
+    #print(var.shape)
+
+    mask = np.zeros_like(var)
+    mask[-1, :] = 1
+    mask[:, -1] = 1
+    
+    gap = mask * (var / counts)
+    while budget > 0:
+        biggest_gap = np.unravel_index(np.argmax(gap, axis=None), gap.shape)
+        i, j = biggest_gap
+        out = sample(psro, history, i, j)
+
+        var = compute_variance(len(policies[0]), history)
+        counts[i, j] += 1
+        gap = mask * (var / counts)
+
+        budget -= 1
+    
+    #print(counts)
+    counts = get_counts(len(policies[0]), history)
     meta_game = compute_matrix(len(policies[0]), history)
     return meta_game
 

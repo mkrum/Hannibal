@@ -19,7 +19,7 @@ from open_spiel.python.algorithms.psro_v2 import ( best_response_oracle,
 from open_spiel.python.algorithms.psro_v2.psro_v2 import PSROSolver
 from open_spiel.python.algorithms.psro_v2.optimization_oracle import AbstractOracle
 
-from samplers import *
+import samplers as S
 
 
 def meta_game_to_list(meta_game):
@@ -44,7 +44,7 @@ def debug_iteration(psro, sampler, N, history, verbose=False):
 
     # Update the payoff matrix
     start = time.time()
-    compute_meta_game(psro, sampler, N, history)
+    S.compute_meta_game(psro, sampler, N, history)
     end = time.time()
 
     info["sims_elapse"] = end - start
@@ -124,7 +124,7 @@ def generate_data(prd, N, data_dir, sampler, steps=100):
         "starting_exploit": exploit,
     }
     log_file.write(str(info) + "\n")
-    history = initialize_history(PSRO, N)
+    history = S.initialize_history(PSRO, N)
 
     for it in tqdm.tqdm(range(steps)):
         info = debug_iteration(PSRO, sampler, N, history)
@@ -139,10 +139,14 @@ def generate_data(prd, N, data_dir, sampler, steps=100):
     log_file.close()
 
 
-def main(prd, N, data_dir, sampler):
-
-    while True:
-        generate_data(prd, N, data_dir, sampler)
+def main(T, prd, N, data_dir, sampler):
+    
+    if T is None:
+        while True:
+            generate_data(prd, N, data_dir, sampler)
+    else:
+        for _ in range(T):
+            generate_data(prd, N, data_dir, sampler)
 
 if __name__ == "__main__":
 
@@ -151,15 +155,15 @@ if __name__ == "__main__":
     parser.add_argument("--N", default=10, type=int, help="Samples Per Interaction")
     parser.add_argument("--sampler", default="baseline_uniform", help="Name of sampler")
     parser.add_argument("--dir", default="data", help="output_directory")
+    parser.add_argument("--T", default=None, type=int, help="Total number of sims to run")
     args = parser.parse_args()
 
     sampler = None
-    if args.sampler == "baseline_uniform":
-        sampler = baseline_uniform
-    elif args.sampler == "ucb":
-        sampler = ucb
-    elif args.sampler == "simple_ucb":
-        sampler = simple_ucb
+    if hasattr(S, args.sampler):
+        sampler = getattr(S, args.sampler)
+    else:
+        print(f"cant find {args.sampler}")
+        exit()
     
     os.makedirs(args.dir, exist_ok=True)
-    main(args.prd, args.N, args.dir, sampler)
+    main(args.T, args.prd, args.N, args.dir, sampler)
