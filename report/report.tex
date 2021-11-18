@@ -1,0 +1,113 @@
+\documentclass{article}
+
+\usepackage[margin=0.5in]{geometry}
+\usepackage{natbib, amsmath, amsfonts, algpseudocode, algorithm}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\begin{document}
+
+\noindent \large\textbf{Multiagent Reinforcement Learning}
+
+\noindent \large Michael Krumdick, Geoffrey Liu
+
+\section{Progress}
+Our main work so far has been getting our experimental setup working and
+analyzing the existing algorithms. We are using the Open Spiel \cite{
+
+\begin{enumerate}
+    \item AlphaRank is \textbf{\textit{slow.}}
+    \item Noisy evaluation matrices degrade performance, but still work.
+    \item Good meta-solvers induce distributions that are very different from
+            the baseline strategies (Uniform, biased Uniform, etc).
+\end{enumerate}
+
+\section{Background and Related Works}
+
+\subsection{MDPs}
+%% 1. What is an MDP
+A \textbf{Markov decision process (MDP)} \cite{MDP} is a common formulation of decision making
+problem. Each MDP can be defined by a four-item tuple. $<S, A, P, R>$
+\begin{enumerate}
+        \item $S$: The space of valid states.
+        \item $A$: The space of valid actions.
+        \item $P_a(s, s')$: A transition function.
+        \item $R_a(s, s')$: A reward function.
+\end{enumerate}
+The solution to the MDP will come in the form of a policy $\pi$ which represents
+a mapping $S \to \Delta(A_s)$, or from the state space to a distribution over
+action space. The policy deemed optimal will obtain the highest
+expected reward, with some discount. 
+\begin{equation}
+        % This is wrong, fix to something more normal
+        \pi^* = \argmax_{\pi \in \Pi} \sum_{s \in S} d^\pi(s) \mathbb{E}_{a \sim \pi(s)} r(s, a)
+\end{equation}
+
+Reinforcement learning is one method of finding these policies that has seen
+success. This family of methods has seen increased attention 
+Algorithms such as \dots % Cite some fun success
+
+A \textbf{normal form game} can be defined $(N, A, u)$
+\begin{enumerate}
+    \item $N$, the number of players
+    \item $A$, the number of players
+    \item $u$, the number of players
+\end{enumerate}
+
+
+\begin{algorithm}
+\caption{Double Oracle}
+\begin{algorithmic}
+    \State $\textbf{actions} \gets \textbf{RandomAction}()$
+    \State $M \gets \textbf{ComputePayoff(actions)}$
+    \For{i = 1:N}
+        \State $\pi_i \gets \textbf{MetaSolver}(M)$
+        \State $\textbf{newAction} \gets \textbf{ResponseOracle}(\pi_i,
+        \textbf{actions)}$
+        \State $M_i \gets \textbf{UpdatePayoff(actions, newAction)}$ \Comment{Fill
+        in the new rows and columns for the new agent}
+        \State $\textbf{actions} \gets \textbf{append(actions, newAction)}$
+    \EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{PSRO}
+\begin{algorithmic}
+    \State $\textbf{agents} \gets \textbf{RandomAgents}()$
+    \State $M \gets \textbf{ComputePayoff(agents)}$
+    \For{i = 1:N}
+        \State $\pi_i \gets \textbf{MetaSolver}(M)$
+        \State $\textbf{newAgent} \gets \textbf{ResponseOracle}(\pi_i, \textbf{agents)}$
+        \State $M_i \gets \textbf{UpdatePayoff(agents, newAgent)}$ \Comment{Fill
+        in the new rows and columns for the new agent}
+        \State $\textbf{agents} \gets \textbf{append(agents, newAgent)}$
+    \EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\begin{center}
+\begin{table}
+\centering
+\begin{tabular}{ c | c | c }
+\textbf{Name} & \textbf{Time Complexity} & \textbf{Convergence} \\
+\hline
+Uniform & O(1) & - \\
+Regret Minimization & O(n) & - \\
+Nash & O($n^p$) & - \\
+AlphaRank & O($n^p$) & - \\
+\end{tabular}
+\caption{Meta Solvers for Zero Sum Games}
+\end{table}
+\end{center}
+
+Every time you add a new agent, you need to fill in $2n + 1$ cells.
+
+Kuhn Poker is a simplified version of poker. The deck consists of three cards,
+the King, Queen and Jack, 
+
+\bibliography{report}
+
+\bibliographystyle{plain}
+
+\end{document}
